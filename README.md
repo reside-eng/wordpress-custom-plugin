@@ -1,5 +1,5 @@
 # Writing a WordPress Plugin
-At Reside we focus on reliably growing our agent's business. Part of this growth strategy includes establishing a strong online presence. In comes WordPress. While working with and managing 30+ WordPress sites, we have used several great themes and plugins that allow us to quickly and easily roll out amazing sites to our agents. However, we've come to realize that themes and plugins are not one size fit all. We often run into complications when needing to start adding new functionality or modifying the way existing features work. Sometimes a minor tweak to a plugin template file will be enough, but sometimes we need access and modify 3rd party data. The easiest way to accomplish this is to incorporate 3rd party data into a new custom plugin.
+At Reside we focus on reliably growing our agent's business. Part of this growth strategy includes establishing a strong online presence. In comes WordPress. While working with and managing 30+ WordPress sites, we have used several great themes and plugins that allow us to quickly and easily roll out amazing sites to our agents. However, we've come to realize that themes and plugins are not one size fit all. We often run into complications when needing to start adding new functionality or modifying the way existing features work. Sometimes a minor tweak to a plugin template file will be enough, but sometimes we need access and to modify 3rd party data. The easiest way to accomplish this is to incorporate 3rd party data into a new custom plugin.
 
 ## 6 Concepts I Learned About When Creating a WordPress Plugin
 We had a case where we needed to access 3rd party data that was not offered within a current plugin and display it in a certain format. Since this was my first time rolling out a custom plugin for WordPress, there were a lot of concepts I had to figure out. I am hoping through my experience I can help other developers find their way to writing their first WordPress plugin. Here is an outline of key areas I had to figure out for my plugin. Note: you will be able to find a complete example plugin [here](https://github.com/chriscasper/wordpress-custom-plugin).
@@ -20,10 +20,10 @@ The first step in building a plugin is laying the foundation. The best approach 
 The generator just needs a few things filled out:
 - Plugin Name: Name of the plugin.
 - Plugin Slug: This is used internally within WordPress for the plugin. Make sure it's all lowercase
-- Plugin URI - Website address of the plugin.
-- Author Name: Author's Name
-- Author Email: Author's email address.
-- Author URI: Author's website address.
+- Plugin URI: Website address of the plugin.
+- Author Name
+- Author Email
+- Author URI
 
 After you have everything filled out just click "Build Plugin". Once it is finished downloading just unzip it and move the folder into the `/wp-content/plugins` folder within your WordPress install.
 
@@ -34,7 +34,7 @@ For this there is a couple built in WordPress functions we need to utilize. Firs
 
 With these two functions we can add a main (parent) menu item along with two children items. In this case we are adding a settings page and a secondary page.
 
-**Note:** A good rule of thumb is to make the parent menu item and the first child menu item go to the same page. if you are intending to have more than one page. In order to do this, both the parent and first child menu items need to have the same menu slug.
+**Note:** If you plan on having more than one page, a good rule of thumb is to make the parent menu item and the first child menu item go to the same page. In order to do this, both the parent and first child menu items need to have the same menu slug.
 
 ![WP Admin Menu](../assets/admin-menu.png)
 
@@ -73,7 +73,7 @@ public function add_admin_menu() {
 }
 ```
 
-For this next bit we will need to work with WordPress actions to get the menu items to render out. You can read more on [WordPress Actions here](https://developer.wordpress.org/reference/functions/add_action/). They are pretty straightforward to work with. Basically we are just utilizing one of WordPress's hooks. We just need to tell WordPress which hook we want to have the function called and what the function name is.
+For this next bit we will need to work with WordPress actions to get the menu items to render out. You can read more on [WordPress Actions here](https://developer.wordpress.org/reference/functions/add_action/). They are pretty straightforward to work with. Basically we are just utilizing one of WordPress's hooks. We just need to tell WordPress which hook we want the function called, as well as the function name.
 
 In order to implement this in the plugin we will need to call the menu functions at the right time. To do that we will put these function calls into their own function which will be called via a WordPress action. So in the constructor we will add an `add_action` call.
 
@@ -157,7 +157,7 @@ For setting up the individual form fields for each section, there is some helper
 This is a pretty general overview of setting up forms and form fields for the settings page, but its pretty straight forward. All of this code is contained in the `admin/class-wordpress-custom-plugin-admin.php` file.
 
 ## URL Rewrites for Custom Plugin URLs
-With a custom plugin comes custom URLs for it. With the custom plugin sample, it is displaying custom data to a unique URL which also allows for pagination. The next section will cover the pagination part.
+Each custom plugin comes with a custom URL. The custom plugin sample is displaying custom data to a unique URL, which also allows for pagination. The next section will cover the pagination part.
 
 ``` php
 public function setup_rewrites() {
@@ -198,7 +198,7 @@ public function register_query_values($vars)
 }
 ```
 
-Once the parameters are defined like the above code, we can then register them with Wordpress. The plugin uses the WordPress [`add_filter`](https://developer.wordpress.org/reference/functions/add_filter/) function for this. Now with the custom URL rewrites we can map those to URLs using custom query parameters.
+Once the parameters are defined like the above code, we can then register them with Wordpress. The plugin uses the WordPress [`add_filter`](https://developer.wordpress.org/reference/functions/add_filter/) function for this. We can now map the custom URL rewrites to URLs using custom query parameters.
 
 ``` php
 $this->loader->add_filter( 'query_vars', $plugin_public, 'register_query_values' );
@@ -224,7 +224,7 @@ public function register_custom_plugin_redirect()
 }
 ```
 
-In the above code we are just doing a simple if check to see if the URL coming through contains our custom query parameters. If it matches then we can display the relevant template. In typical fashion, we need to notify WordPress that we have some logic that can choose a custom template based off of the query parameters. For this we will add another action. This is adding this check into the WordPress `template_redirect` hook.
+In the above code we are just doing a simple `if` check to see if the URL coming through contains our custom query parameters. If it matches then we can display the relevant template. In typical fashion, we need to notify WordPress that we have some logic that can choose a custom template based off of the query parameters. For this we will add another action adding this check into the Wordpress `template_redirect` hook.
 
 ``` php
 $this->loader->add_action( 'template_redirect', $plugin_public, 'register_custom_plugin_redirect' );
@@ -259,7 +259,7 @@ $custom_plugin_obj = new Wordpress_Custom_Plugin_Public('wordpress-custom-plugin
 $vehicle_listings = $custom_plugin_obj->get_vehicle_listings(10, $custom_plugin_current_page);
 ```
 
-In the above code, first we are going to check a query parameter and see if it contains some data. In this case we are checking a custom parameter thats holding what page number we are on. Next we are setting up the public class for our plugin. Once that is done we can now access the function within the plugin, `get_vehicle_listings()`. With this call we can pass in how many vehicles we want to list and the current page we are on.
+In the above code, first we are going to check a query parameter and see if it contains some data. In this case we are checking a custom parameter thats holding what page number we are on. Next we are setting up the public class for our plugin. Once that is done we can now access the function within the plugin, `get_vehicle_listings()`. With this call we can pass how many vehicles we want to list and the current page we are on.
 
 In the `get_vehicle_listings()` we can do some logic to return back 10 listings based on the page we are. The following logic will get all vehicles, then pull out the ones we need to display.
 
@@ -329,4 +329,4 @@ I've compiled a couple resources that were extremely helpful for me when buildin
 - WordPress Plugin Boilerplate Generator [https://wppb.me/](https://wppb.me/)
 
 ## Example Custom Plugin Code
-I have put all the example code from this article in a public GitHub repo. This is a full functioning custom WordPress Plugin. I welcome any comments or changes. [https://github.com/chriscasper/wordpress-custom-plugin](https://github.com/chriscasper/wordpress-custom-plugin)
+I have put all the example code from this article in a public GitHub repo. This is a full functioning custom WordPress Plugin. I welcome any comments or changes. [https://github.com/reside-eng/wordpress-custom-plugin](https://github.com/reside-eng/wordpress-custom-plugin)
